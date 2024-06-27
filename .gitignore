@@ -1,0 +1,17 @@
+*.obj
+*.pch
+*.ilk
+*.pdb
+*.lib
+*.exp
+*.log
+*.d
+*.dSYM/
+*.exe
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+/src/*.exe
+/src/*.o
