@@ -1,29 +1,33 @@
 #include <SFML/Graphics.hpp>
+#include "../headers/game.hpp"
 
-int main()
-{
-    // create the window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+int main() {
+    sf::RenderWindow window(sf::VideoMode(900, 900), "Mini Golf");
+    GolfGame game;
+    sf::Clock clock;
 
-    // run the program as long as the window is open
-    while (window.isOpen())
-    {
-        // check all the window's events that were triggered since the last iteration of the loop
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // "close requested" event: we close the window
+
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                game.handlePress(event);
+            }
+
+            if (event.type == sf::Event::MouseButtonReleased) {
+                game.handleRelease(event);
+            }
         }
 
-        // clear the window with black color
+        float deltaTime = clock.restart().asMilliseconds();
+
+        game.update(deltaTime);
+
         window.clear(sf::Color::Black);
-
-        // draw everything here...
-        // window.draw(...);
-
-        // end the current frame
+        game.draw(window);
         window.display();
     }
 
