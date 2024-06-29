@@ -11,8 +11,10 @@ private:
     sf::Vector2f finalPos;
     float velMagnitude;
     sf::Vector2f velDirection;
+    bool validClick = false;
 public:
     GolfGame();
+
     void draw(sf::RenderWindow& window);
     void handlePress(sf::Event& event);
     void handleRelease(sf::Event& event);

@@ -11,6 +11,7 @@ private:
     const float friction;
 public:
     Ball(int x, int y, int radius);
+
     void draw(sf::RenderWindow& window);
     void setPos(int x, int y);
     sf::Vector2f getPos();
