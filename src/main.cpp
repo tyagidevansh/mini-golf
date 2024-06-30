@@ -3,9 +3,30 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Mini Golf");
+    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
+    unsigned int width = desktopMode.width;
+    unsigned int height = desktopMode.height;
+    if (width * 9 > height * 16) {
+        width = height * 16 / 9;
+    } else {
+        height = width * 9 / 16;
+    }
+
+    sf::RenderWindow window(sf::VideoMode(width, height), "Mini Golf", sf::Style::Fullscreen);
     GolfGame game;
     sf::Clock clock;
+
+    sf::Texture backgroundTexture;
+    if (!backgroundTexture.loadFromFile("assets/background.jpg")) {
+        return -1;
+    }
+
+    sf::Sprite backgroundSprite(backgroundTexture);
+    backgroundSprite.setScale(
+        float(width) / backgroundTexture.getSize().x,
+        float(height) / backgroundTexture.getSize().y
+    );
 
     while (window.isOpen())
     {
@@ -26,8 +47,9 @@ int main()
 
         float deltaTime = clock.restart().asSeconds();
 
-        window.clear(sf::Color::Black);
-        game.update(deltaTime);
+        window.clear();
+        window.draw(backgroundSprite);
+        game.update(deltaTime, window);
         game.draw(window);
         window.display();
     }

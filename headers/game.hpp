@@ -19,7 +19,7 @@ public:
     void handlePress(sf::Event& event);
     void handleRelease(sf::Event& event);
     void calculateVelocity();
-    void update(float deltaTime);
+    void update(float deltaTime, const sf::RenderWindow& window);
 };
 
 #endif // GAME_HPP

@@ -4,19 +4,20 @@
 #include <SFML/Graphics.hpp>
 
 class Ball {
-private:
-    sf::CircleShape shape;
-    float velMagnitude;
-    sf::Vector2f velDirection;
-    const float friction;
 public:
-    Ball(int x, int y, int radius);
-
+    Ball(int x, int y, int radius, const std::string& textureFile);
     void draw(sf::RenderWindow& window);
     void setPos(int x, int y);
     sf::Vector2f getPos();
     void move(float velMagnitude, sf::Vector2f velDirection);
-    void update(float deltaTime);
+    void update(float deltaTime, const sf::RenderWindow& window);
+
+private:
+    sf::Sprite sprite;
+    sf::Texture texture;
+    float velMagnitude;
+    sf::Vector2f velDirection;
+    float friction;
 };
 
 #endif // BALL_HPP

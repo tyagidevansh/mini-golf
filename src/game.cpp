@@ -1,7 +1,7 @@
 #include "../headers/game.hpp"
 #include <cmath>
 
-GolfGame::GolfGame() : ball(390, 500, 10) {}
+GolfGame::GolfGame() : ball(390, 500, 10, "assets/golfBall.png") {}
 
 void GolfGame::draw(sf::RenderWindow& window) {
     ball.draw(window);
@@ -36,6 +36,6 @@ void GolfGame::calculateVelocity() {
     velDirection = velDirection; 
 }
 
-void GolfGame::update(float deltaTime) {
-    ball.update(deltaTime);
+void GolfGame::update(float deltaTime, const sf::RenderWindow& window) {
+    ball.update(deltaTime, window);
 }
