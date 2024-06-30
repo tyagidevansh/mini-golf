@@ -13,11 +13,12 @@ class Map {
 private:
   std::vector<std::vector<int>> grid;
   float cellSize;
-  sf::RectangleShape obstacle;
   sf::RenderWindow& window;
+  sf::Texture obstacleTexture;
+  sf::Sprite obstacle;
 
 public:
-  Map(int width, int height, sf::RenderWindow& window);
+  Map(int width, int height, sf::RenderWindow& window, const std::string& textureFile);
   void loadMap(const std::vector<std::vector<int>>& mapData);
   void loadMapFromFile(const std::string& filePath);
   void draw();

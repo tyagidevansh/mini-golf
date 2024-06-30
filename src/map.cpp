@@ -1,12 +1,20 @@
 #include "../headers/map.hpp"
 #include <fstream>
 #include <stdexcept>
+#include <iostream>
 
-Map::Map(int height, int width, sf::RenderWindow& window)
+Map::Map(int height, int width, sf::RenderWindow& window, const std::string& textureFile)
     : grid(height, std::vector<int>(width, EMPTY)), window(window) {
+
+    if (!obstacleTexture.loadFromFile(textureFile)) {
+      std::cerr << "Error loading texture";
+    }
+    
+    obstacle.setTexture(obstacleTexture);
     this->cellSize = window.getSize().x / width;
-    obstacle.setSize(sf::Vector2f(cellSize, cellSize));
-    obstacle.setFillColor(sf::Color::Red);
+    float scaleFactor = static_cast<float> (cellSize) / obstacleTexture.getSize().x; 
+    obstacle.setScale(scaleFactor, scaleFactor);
+    obstacle.setOrigin(cellSize, cellSize);
 }
 
 void Map::loadMap(const std::vector<std::vector<int>>& mapData) {

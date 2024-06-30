@@ -82,18 +82,6 @@ void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
             newPos.y = pos.y;
         }
 
-        // if (map.isObstacle(newCenter.x, pos.y) == 1|| map.isObstacle(newCenter.x, pos.y) == 1 ||
-        //     map.isObstacle(newCenter.x, pos.y + ballRadius.y * 2) == 1|| map.isObstacle(newCenter.x, pos.y - ballRadius.y * 2) == 1) {
-        //     velDirection.x = -velDirection.x;
-        //     newPos.x = pos.x;
-        // }
-
-        // if (map.isObstacle(pos.x, newCenter.y) == 1 || map.isObstacle(pos.x, newCenter.y) == 1 ||
-        //     map.isObstacle(pos.x, newCenter.y + ballRadius.y * 2) == 1 || map.isObstacle(pos.x, newCenter.y - ballRadius.y * 2) == 1) {
-        //     velDirection.y = -velDirection.y;
-        //     newPos.y = pos.y;
-        // }
-
         sprite.setPosition(newPos);
     }
 }
