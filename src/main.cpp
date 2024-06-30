@@ -14,7 +14,7 @@ int main()
     }
 
     sf::RenderWindow window(sf::VideoMode(width, height), "Mini Golf", sf::Style::Fullscreen);
-    GolfGame game;
+    GolfGame game(window);
     sf::Clock clock;
 
     sf::Texture backgroundTexture;

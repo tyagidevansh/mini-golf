@@ -1,6 +1,7 @@
 #ifndef BALL_HPP
 #define BALL_HPP
 
+#include "../headers/map.hpp"
 #include <SFML/Graphics.hpp>
 
 class Ball {
@@ -10,7 +11,7 @@ public:
     void setPos(int x, int y);
     sf::Vector2f getPos();
     void move(float velMagnitude, sf::Vector2f velDirection);
-    void update(float deltaTime, const sf::RenderWindow& window);
+    void update(float deltaTime, const sf::RenderWindow& window, Map& map);
 
 private:
     sf::Sprite sprite;

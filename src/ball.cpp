@@ -32,33 +32,68 @@ void Ball::move(float velMagnitude, sf::Vector2f velDirection) {
     std::cout << "Velocity Direction: " << this->velDirection.x << " " << this->velDirection.y << "\n";
 }
 
-void Ball::update(float deltaTime, const sf::RenderWindow& window) {
+void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
     if (velMagnitude > 0) {
         sf::Vector2f pos = sprite.getPosition();
-        pos += velDirection * velMagnitude * deltaTime;
+        sf::Vector2f newPos = pos + velDirection * velMagnitude * deltaTime;
 
         velMagnitude -= friction * velMagnitude * deltaTime;
         if (velMagnitude < 0) velMagnitude = 0; 
 
         sf::Vector2u windowSize = window.getSize();
 
-        if (pos.x < 0) {
-            pos.x = 0;
+        // Wall collisions
+        if (newPos.x < 0) {
+            newPos.x = 0;
             velDirection.x = -velDirection.x;
         }
-        if (pos.x > windowSize.x - sprite.getGlobalBounds().width) { 
-            pos.x = windowSize.x - sprite.getGlobalBounds().height;
+        if (newPos.x > windowSize.x - sprite.getGlobalBounds().width) { 
+            newPos.x = windowSize.x - sprite.getGlobalBounds().width;
             velDirection.x = -velDirection.x;
         }
-        if (pos.y < 0) {
-            pos.y = 0;
+        if (newPos.y < 0) {
+            newPos.y = 0;
             velDirection.y = -velDirection.y;
         }
-        if (pos.y > windowSize.y - sprite.getGlobalBounds().height) { 
-            pos.y = windowSize.y - sprite.getGlobalBounds().height;
+        if (newPos.y > windowSize.y - sprite.getGlobalBounds().height) {
+            newPos.y = windowSize.y - sprite.getGlobalBounds().height;
             velDirection.y = -velDirection.y;
         }
 
-        sprite.setPosition(pos);
+        float ballRadius = sprite.getGlobalBounds().width / 2;
+        
+        if (map.isObstacle(newPos.x, pos.y)) {
+            velDirection.x = -velDirection.x;
+            newPos.x = pos.x;
+        }
+
+        if (map.isObstacle(pos.x, newPos.y)) {
+            velDirection.y = -velDirection.y;
+            newPos.y = pos.y;
+        }
+
+        if (map.isObstacle(newPos.x + ballRadius, pos.y)) {
+            velDirection.x = -velDirection.x;
+            newPos.x = pos.x;
+        }
+
+        if (map.isObstacle(pos.x, newPos.y + ballRadius)) {
+            velDirection.y = -velDirection.y;
+            newPos.y = pos.y;
+        }
+
+        // if (map.isObstacle(newCenter.x, pos.y) == 1|| map.isObstacle(newCenter.x, pos.y) == 1 ||
+        //     map.isObstacle(newCenter.x, pos.y + ballRadius.y * 2) == 1|| map.isObstacle(newCenter.x, pos.y - ballRadius.y * 2) == 1) {
+        //     velDirection.x = -velDirection.x;
+        //     newPos.x = pos.x;
+        // }
+
+        // if (map.isObstacle(pos.x, newCenter.y) == 1 || map.isObstacle(pos.x, newCenter.y) == 1 ||
+        //     map.isObstacle(pos.x, newCenter.y + ballRadius.y * 2) == 1 || map.isObstacle(pos.x, newCenter.y - ballRadius.y * 2) == 1) {
+        //     velDirection.y = -velDirection.y;
+        //     newPos.y = pos.y;
+        // }
+
+        sprite.setPosition(newPos);
     }
 }

@@ -1,9 +1,12 @@
 #include "../headers/game.hpp"
 #include <cmath>
 
-GolfGame::GolfGame() : ball(390, 500, 10, "assets/golfBall.png") {}
+GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window) {
+    loadLevel("levels/level1.txt");
+}
 
 void GolfGame::draw(sf::RenderWindow& window) {
+    map.draw();
     ball.draw(window);
 }
 
@@ -37,5 +40,9 @@ void GolfGame::calculateVelocity() {
 }
 
 void GolfGame::update(float deltaTime, const sf::RenderWindow& window) {
-    ball.update(deltaTime, window);
+    ball.update(deltaTime, window, map);
+}
+
+void GolfGame::loadLevel(const std::string& filePath) {
+    map.loadMapFromFile(filePath);
 }
