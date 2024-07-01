@@ -7,6 +7,8 @@
 enum CellType {
   EMPTY,
   OBSTACLE,
+  SAND,
+  HOLE,
 };
 
 class Map {
@@ -16,13 +18,17 @@ private:
   sf::RenderWindow& window;
   sf::Texture obstacleTexture;
   sf::Sprite obstacle;
+  sf::Texture holeTexture;
+  sf::Sprite hole;
 
 public:
-  Map(int width, int height, sf::RenderWindow& window, const std::string& textureFile);
+  Map(int width, int height, sf::RenderWindow& window, const std::string& textureFile, const std::string& holeTextureFile);
   void loadMap(const std::vector<std::vector<int>>& mapData);
   void loadMapFromFile(const std::string& filePath);
   void draw();
   bool isObstacle(int x, int y);
+  bool isHole(int x, int y);
+  sf::Vector2f getHoleCenter();
   sf::Vector2i getCellCoords(sf::Vector2f position);
 };
 

@@ -1,7 +1,7 @@
 #include "../headers/game.hpp"
 #include <cmath>
 
-GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png") {
+GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
     loadLevel("levels/level1.txt");
 }
 

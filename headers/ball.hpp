@@ -19,6 +19,8 @@ private:
     float velMagnitude;
     sf::Vector2f velDirection;
     float friction;
+    float scaleFactor;
+    bool scaling;
 };
 
 #endif // BALL_HPP
