@@ -6,6 +6,7 @@ Ball::Ball(int x, int y, int radius, const std::string& textureFile) : velMagnit
     if (!texture.loadFromFile(textureFile)) {
         std::cerr << "Error loading texture from file" << std::endl;
     }
+    initialPos = sf::Vector2f(x, y);
     sprite.setTexture(texture);
     sprite.setPosition(x, y);
     scaleFactor = static_cast<float>(radius * 2) / texture.getSize().x;
@@ -33,12 +34,14 @@ void Ball::move(float velMagnitude, sf::Vector2f velDirection) {
 void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
     float scalingOnScore = scaleFactor;
     if (scaling) {
-        scalingOnScore -= deltaTime;
-        if (scalingOnScore <= 0) {
-            scalingOnScore = 0;
+        while (scalingOnScore != 0) {
+            scalingOnScore -= deltaTime;
+            if (scalingOnScore <= 0) {
+                scalingOnScore = 0;
+            }
+            sprite.setScale(scaleFactor * scalingOnScore, scaleFactor * scalingOnScore);
         }
-        sprite.setScale(scaleFactor * scalingOnScore, scaleFactor * scalingOnScore);
-        return;
+        sf::sleep(sf::seconds(1));
     }
 
     if (velMagnitude > 0) {
@@ -93,8 +96,23 @@ void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
             velMagnitude = 0;
             newPos = map.getHoleCenter();
             scaling = true;
+            isHoleComplete = true;
         }
 
         sprite.setPosition(newPos);
     }
+}
+
+bool Ball::getHoleStatus() {
+    return isHoleComplete;
+}
+
+void Ball::setHoleStatus() {
+    isHoleComplete = false;
+}
+
+void Ball::reset() {
+    sprite.setPosition(initialPos.x, initialPos.y);
+    scaling = false;
+    sprite.setScale(scaleFactor, scaleFactor);
 }

@@ -14,6 +14,7 @@ private:
     sf::Vector2f velDirection;
     Map map;
     bool validClick = false;
+    int curLevel = 1;
 public:
     GolfGame(sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
@@ -22,6 +23,7 @@ public:
     void calculateVelocity();
     void update(float deltaTime, const sf::RenderWindow& window);
     void loadLevel(const std::string& filePath);
+    void handleLevelUp();
 };
 
 #endif // GAME_HPP

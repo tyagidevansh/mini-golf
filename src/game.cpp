@@ -1,5 +1,7 @@
 #include "../headers/game.hpp"
 #include <cmath>
+#include <iostream>
+#include <SFML/System.hpp>
 
 GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
     loadLevel("levels/level1.txt");
@@ -41,8 +43,22 @@ void GolfGame::calculateVelocity() {
 
 void GolfGame::update(float deltaTime, const sf::RenderWindow& window) {
     ball.update(deltaTime, window, map);
+    if (ball.getHoleStatus()) {
+        handleLevelUp();
+        ball.setHoleStatus();
+        ball.reset();
+    }
 }
 
 void GolfGame::loadLevel(const std::string& filePath) {
     map.loadMapFromFile(filePath);
+}
+
+void GolfGame::handleLevelUp() {
+    std::string filePath = "levels/level";
+    curLevel++;
+    filePath = filePath + std::to_string(curLevel) + ".txt";
+    std::cout << filePath << "\n";
+    loadLevel(filePath);
+    ball.setPos(390, 500);
 }

@@ -12,8 +12,12 @@ public:
     sf::Vector2f getPos();
     void move(float velMagnitude, sf::Vector2f velDirection);
     void update(float deltaTime, const sf::RenderWindow& window, Map& map);
+    bool getHoleStatus();
+    void setHoleStatus();
+    void reset();
 
 private:
+    sf::Vector2f initialPos;
     sf::Sprite sprite;
     sf::Texture texture;
     float velMagnitude;
@@ -21,6 +25,7 @@ private:
     float friction;
     float scaleFactor;
     bool scaling;
+    bool isHoleComplete = false;
 };
 
 #endif // BALL_HPP
