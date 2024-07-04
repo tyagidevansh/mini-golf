@@ -3,25 +3,23 @@
 #include <iostream>
 #include <SFML/System.hpp>
 
-GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png"), strokeCount(0), levelUp(false) {
+GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
     loadLevel("levels/level1.txt");
 
-    // Load the font
     if (!font.loadFromFile("assets/font.ttf")) {
-        std::cerr << "Error loading font" << std::endl;
+        std::cerr << "Error opening font file";
     }
 
-    // Initialize stroke text
     strokeText.setFont(font);
-    strokeText.setCharacterSize(24);
+    strokeText.setCharacterSize(32);
     strokeText.setFillColor(sf::Color::White);
+    //strokeText.setString("0");
     strokeText.setPosition(10, 10);
 
-    // Initialize level-up text
     levelUpText.setFont(font);
-    levelUpText.setCharacterSize(36);
-    levelUpText.setFillColor(sf::Color::Green);
-    levelUpText.setString("Level Up!");
+    levelUpText.setCharacterSize(48);
+    levelUpText.setFillColor(sf::Color::White);
+    levelUpText.setString("Hole complete!");
     levelUpText.setPosition(400, 300);
 }
 
@@ -29,14 +27,8 @@ void GolfGame::draw(sf::RenderWindow& window) {
     map.draw();
     ball.draw(window);
 
-    // Update and draw stroke text
     strokeText.setString("Strokes: " + std::to_string(strokeCount));
     window.draw(strokeText);
-
-    // Draw level-up text if needed
-    if (levelUp) {
-        window.draw(levelUpText);
-    }
 }
 
 void GolfGame::handlePress(sf::Event& event) {
@@ -71,14 +63,9 @@ void GolfGame::calculateVelocity() {
 
 void GolfGame::update(float deltaTime, const sf::RenderWindow& window) {
     ball.update(deltaTime, window, map);
-
     if (ball.getHoleStatus()) {
-        levelUp = true;
-        ball.setHoleStatus();
-
-        // Wait for 1 second before handling level up
-        sf::sleep(sf::seconds(1));
         handleLevelUp();
+        ball.setHoleStatus();
         ball.reset();
     }
 }
@@ -94,6 +81,5 @@ void GolfGame::handleLevelUp() {
     std::cout << filePath << "\n";
     loadLevel(filePath);
     ball.setPos(390, 500);
-    strokeCount = 0; // Reset stroke count for new level
-    levelUp = false; // Reset level up flag
+    strokeCount = 0;
 }

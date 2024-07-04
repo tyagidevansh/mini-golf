@@ -1,7 +1,7 @@
 #ifndef BALL_HPP
 #define BALL_HPP
 
-#include "../headers/map.hpp"
+#include "map.hpp"
 #include <SFML/Graphics.hpp>
 
 class Ball {
@@ -23,7 +23,6 @@ private:
     float velMagnitude;
     sf::Vector2f velDirection;
     float friction;
-    float scaleFactor;
     bool scaling;
     bool isHoleComplete = false;
 };
