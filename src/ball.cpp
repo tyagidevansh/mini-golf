@@ -1,20 +1,28 @@
 #include "../headers/ball.hpp"
 #include <iostream>
 #include <SFML/System.hpp>
+#include <math.h>
 
-Ball::Ball(int x, int y, int radius, const std::string& textureFile) : velMagnitude(0), friction(1.0f), scaling(false) {
+Ball::Ball(int x, int y, int radius, const std::string& textureFile) : velMagnitude(0), friction(1.0f) {
     if (!texture.loadFromFile(textureFile)) {
-        std::cerr << "Error loading texture from file: " << textureFile << std::endl;
+        std::cerr << "Error loading texture from file" << std::endl;
     }
     initialPos = sf::Vector2f(x, y);
     sprite.setTexture(texture);
     sprite.setPosition(x, y);
+    scaleFactor = static_cast<float>(radius * 2) / texture.getSize().x;
+    sprite.setScale(scaleFactor, scaleFactor);
     sprite.setOrigin(radius, radius);
-    sprite.setScale(2.0f * radius / texture.getSize().x, 2.0f * radius / texture.getSize().y); 
+
+    // Initialize power indicator
+    powerIndicator.setSize(sf::Vector2f(0, 5)); // Initial size, adjust height as needed
+    powerIndicator.setFillColor(sf::Color::Red); // Set color
+    powerIndicator.setOrigin(0, 2.5); // Set origin to the middle of the height
 }
 
 void Ball::draw(sf::RenderWindow& window) {
     window.draw(sprite);
+    window.draw(powerIndicator); // Draw power indicator
 }
 
 void Ball::setPos(int x, int y) {
@@ -31,7 +39,17 @@ void Ball::move(float velMagnitude, sf::Vector2f velDirection) {
 }
 
 void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
-    float ballRadius = sprite.getGlobalBounds().width / 2.0f;
+    float scalingOnScore = scaleFactor;
+    if (scaling) {
+        while (scalingOnScore != 0) {
+            scalingOnScore -= deltaTime;
+            if (scalingOnScore <= 0) {
+                scalingOnScore = 0;
+            }
+            sprite.setScale(scaleFactor * scalingOnScore, scaleFactor * scalingOnScore);
+        }
+        sf::sleep(sf::seconds(1));
+    }
 
     if (velMagnitude > 0) {
         sf::Vector2f pos = sprite.getPosition();
@@ -42,22 +60,25 @@ void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
 
         sf::Vector2u windowSize = window.getSize();
 
-        if (newPos.x < ballRadius) {
-            newPos.x = ballRadius;
+
+        if (newPos.x < 0) {
+            newPos.x = 0;
             velDirection.x = -velDirection.x;
         }
-        if (newPos.x > windowSize.x - ballRadius) { 
-            newPos.x = windowSize.x - ballRadius;
+        if (newPos.x > windowSize.x - sprite.getGlobalBounds().width) { 
+            newPos.x = windowSize.x - sprite.getGlobalBounds().width;
             velDirection.x = -velDirection.x;   
         }
-        if (newPos.y < ballRadius) {
-            newPos.y = ballRadius;
+        if (newPos.y < 0) {
+            newPos.y = 0;
             velDirection.y = -velDirection.y;
         }
-        if (newPos.y > windowSize.y - ballRadius) {
-            newPos.y = windowSize.y - ballRadius;
+        if (newPos.y > windowSize.y - sprite.getGlobalBounds().height) {
+            newPos.y = windowSize.y - sprite.getGlobalBounds().height;
             velDirection.y = -velDirection.y;
         }
+
+        float ballRadius = sprite.getGlobalBounds().width / 2;
 
         if (map.isObstacle(newPos.x - ballRadius, pos.y) || map.isObstacle(newPos.x + ballRadius, pos.y)) {
             velDirection.x = -velDirection.x;
@@ -98,6 +119,13 @@ void Ball::setHoleStatus() {
 }
 
 void Ball::reset() {
-    sprite.setPosition(initialPos);
+    sprite.setPosition(initialPos.x, initialPos.y);
     scaling = false;
+    sprite.setScale(scaleFactor, scaleFactor);
+}
+
+void Ball::updatePowerIndicator(float power, sf::Vector2f direction) {
+    powerIndicator.setSize(sf::Vector2f(power, 5)); 
+    powerIndicator.setPosition(sprite.getPosition()); 
+    powerIndicator.setRotation(atan2(direction.y, direction.x) * 180 / 3.14159); 
 }

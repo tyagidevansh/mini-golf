@@ -1,7 +1,7 @@
 #ifndef BALL_HPP
 #define BALL_HPP
 
-#include "map.hpp"
+#include "../headers/map.hpp"
 #include <SFML/Graphics.hpp>
 
 class Ball {
@@ -15,6 +15,7 @@ public:
     bool getHoleStatus();
     void setHoleStatus();
     void reset();
+    void updatePowerIndicator(float power, sf::Vector2f direction);
 
 private:
     sf::Vector2f initialPos;
@@ -23,8 +24,11 @@ private:
     float velMagnitude;
     sf::Vector2f velDirection;
     float friction;
+    float scaleFactor;
     bool scaling;
     bool isHoleComplete = false;
+
+    sf::RectangleShape powerIndicator; // Add power indicator
 };
 
 #endif // BALL_HPP
