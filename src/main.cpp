@@ -31,22 +31,21 @@ int main()
     while (window.isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event)) {
-            switch (event.type) {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-                case sf::Event::MouseButtonPressed:
-                    game.handlePress(event);
-                    break;
-                case sf::Event::MouseButtonReleased:
-                    game.handleRelease(event);
-                    break;
-                case sf::Event::MouseMoved:
-                    game.handleMouseMoved(event);
-                    break;
-                default:
-                    break;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                game.handlePress(event);
+            }
+
+            if (event.type == sf::Event::MouseButtonReleased) {
+                game.handleRelease(event);
+            }
+
+            if (event.type == sf::Event::MouseMoved) {
+                game.handleMouseMoved(event);
             }
         }
 

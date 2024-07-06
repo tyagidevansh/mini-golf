@@ -13,11 +13,13 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
     strokeText.setFont(font);
     strokeText.setCharacterSize(32);
     strokeText.setFillColor(sf::Color::White);
+    //strokeText.setString("0");
     strokeText.setPosition(10, 10);
 
     levelUpText.setFont(font);
     levelUpText.setCharacterSize(48);
     levelUpText.setFillColor(sf::Color::White);
+    levelUpText.setString("Hole complete!");
     levelUpText.setPosition(400, 300);
 }
 
@@ -37,7 +39,7 @@ void GolfGame::handlePress(sf::Event& event) {
             && event.mouseButton.y <= curPos.y + 30 && event.mouseButton.y >= curPos.y - 30) {
             initialPos = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
             validClick = true;
-            isMousePressed = true; 
+            isMousePressed = true;
         }
     }
 }
@@ -48,57 +50,40 @@ void GolfGame::handleRelease(sf::Event& event) {
         calculateVelocity();
         ball.move(velMagnitude, velDirection);
         strokeCount++;
-        isMousePressed = false; 
+        isMousePressed = false;
     }
 }
 
-void GolfGame::handleMouseMoved(sf::Event& event) {
-    if (isMousePressed && validClick) {
-        sf::Vector2f currentPos(event.mouseMove.x, event.mouseMove.y);
-        velDirection = initialPos - currentPos;
-        velMagnitude = std::sqrt(velDirection.x * velDirection.x + velDirection.y * velDirection.y);
-        if (velMagnitude != 0) {
-            velDirection /= velMagnitude;
-        }
-        ball.updatePowerIndicator(velMagnitude, velDirection); 
+
+
+void GolfGame::calculateVelocity() {
+    velDirection =initialPos - finalPos;
+    velMagnitude = std::sqrt(velDirection.x * velDirection.x + velDirection.y * velDirection.y);
+    if (velMagnitude != 0) {
+        velDirection /= velMagnitude;
     }
+    velDirection = velDirection; 
 }
 
-void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
+void GolfGame::update(float deltaTime, const sf::RenderWindow& window) {
     ball.update(deltaTime, window, map);
     if (ball.getHoleStatus()) {
-        handleLevelUp(window);
+        handleLevelUp();
+        ball.setHoleStatus();
+        ball.reset();
     }
 }
 
 void GolfGame::loadLevel(const std::string& filePath) {
     map.loadMapFromFile(filePath);
-    ball.reset();
-    strokeCount = 0;
 }
 
-void GolfGame::calculateVelocity() {
-    velDirection = initialPos - finalPos;
-    velMagnitude = std::sqrt(velDirection.x * velDirection.x + velDirection.y * velDirection.y);
-    if (velMagnitude != 0) {
-        velDirection /= velMagnitude;
-    }
-}
-
-void GolfGame::handleLevelUp(sf::RenderWindow& window) {
-    displayLevelUpText(window);
-    sf::sleep(sf::seconds(1));
+void GolfGame::handleLevelUp() {
+    std::string filePath = "levels/level";
     curLevel++;
-    if (curLevel <= 4) {
-        loadLevel("levels/level" + std::to_string(curLevel) + ".txt");
-    }
-    else {
-        exit(0);
-    }
-}
-
-void GolfGame::displayLevelUpText(sf::RenderWindow& window) {
-    levelUpText.setString("Hole complete!");
-    window.draw(levelUpText);
-    window.display();
+    filePath = filePath + std::to_string(curLevel) + ".txt";
+    std::cout << filePath << "\n";
+    loadLevel(filePath);
+    ball.setPos(390, 500);
+    strokeCount = 0;
 }
