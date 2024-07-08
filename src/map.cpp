@@ -75,7 +75,7 @@ bool Map::isObstacle(int x, int y) {
 
 bool Map::isHole(int x, int y) {
   sf::Vector2f pos = hole.getPosition();
-  if (pos.x > x - 15 && pos.x < x + 10 && pos.y > y - 15 && pos.y < y + 10) {
+  if (pos.x > x - 20 && pos.x < x + 10 && pos.y > y - 20 && pos.y < y + 10) {
     return true;
   } else return false;
 }

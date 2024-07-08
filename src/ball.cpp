@@ -14,15 +14,14 @@ Ball::Ball(int x, int y, int radius, const std::string& textureFile) : velMagnit
     sprite.setScale(scaleFactor, scaleFactor);
     sprite.setOrigin(radius, radius);
 
-    // Initialize power indicator
-    powerIndicator.setSize(sf::Vector2f(0, 5)); // Initial size, adjust height as needed
-    powerIndicator.setFillColor(sf::Color::Red); // Set color
-    powerIndicator.setOrigin(0, 2.5); // Set origin to the middle of the height
+    powerIndicator.setSize(sf::Vector2f(0, 5)); 
+    powerIndicator.setFillColor(sf::Color::Red); 
+    powerIndicator.setOrigin(0, 2.5); 
 }
 
 void Ball::draw(sf::RenderWindow& window) {
     window.draw(sprite);
-    window.draw(powerIndicator); // Draw power indicator
+    window.draw(powerIndicator); 
 }
 
 void Ball::setPos(int x, int y) {
