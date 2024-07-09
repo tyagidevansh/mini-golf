@@ -3,7 +3,7 @@
 #include <iostream>
 #include <SFML/System.hpp>
 
-GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
+GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
     loadLevel("levels/level1.txt");
 
     if (!font.loadFromFile("assets/font.ttf")) {
@@ -88,6 +88,7 @@ void GolfGame::calculateVelocity() {
     if (velMagnitude != 0) {
         velDirection /= velMagnitude;
     }
+    //std::cout << velMagnitude << std::endl;
 }
 
 void GolfGame::handleLevelUp(sf::RenderWindow& window) {
