@@ -14,6 +14,7 @@ public:
     void calculateVelocity();
     void handleLevelUp(sf::RenderWindow& window);
     void displayLevelUpText(sf::RenderWindow& window);
+    void showTitleScreen(sf::RenderWindow& window, float elapsedTime);
 
 private:
     Ball ball;
@@ -29,4 +30,7 @@ private:
     sf::Vector2f finalPos;
     sf::Vector2f velDirection;
     float velMagnitude;
+    sf::Texture titleTexture;
+    sf::Sprite titleSprite;
+    sf::Text titleText;
 };

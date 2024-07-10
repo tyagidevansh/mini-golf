@@ -73,6 +73,8 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
 
     if (!isMousePressed) {
         ball.updatePowerIndicator(0, sf::Vector2f(0,0));
+    } else {
+        ball.drawIndicator(window);
     }
 }
 
@@ -108,4 +110,26 @@ void GolfGame::displayLevelUpText(sf::RenderWindow& window) {
     levelUpText.setString("Hole complete!");
     window.draw(levelUpText);
     window.display();
+}
+
+void GolfGame::showTitleScreen(sf::RenderWindow& window, float elapsedTime) {
+    sf::Texture titleTexture;
+    if (!titleTexture.loadFromFile("assets/title.png")) {
+        std::cerr << "Error opening texture file";
+    }
+
+    sf::Sprite titleSprite(titleTexture);
+    titleSprite.setPosition(620, 300);
+    window.draw(titleSprite);
+
+    float amplitude = 10.0f;
+    float frequency = 2.0f;
+    float offset = amplitude * std::sin(frequency * elapsedTime);
+
+    titleText.setFont(font);
+    titleText.setCharacterSize(48);
+    titleText.setFillColor(sf::Color::White);
+    titleText.setPosition(800, 700 + offset);
+    titleText.setString("Press Enter To Play!");
+    window.draw(titleText);
 }

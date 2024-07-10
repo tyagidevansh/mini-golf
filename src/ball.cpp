@@ -38,11 +38,8 @@ Ball::Ball(int x, int y, int radius, const std::string& ballTextureFile, const s
 
 void Ball::draw(sf::RenderWindow& window) {
     window.draw(ballSprite);
-    window.draw(arrowSprite); 
     // window.draw(powerIndicatorBorder); 
     // window.draw(powerIndicator); 
-    window.draw(powerIndicatorBorder);
-    window.draw(&powerIndicatorVertices[0], powerIndicatorVertices.getVertexCount(), powerIndicatorVertices.getPrimitiveType()); 
 }
 
 void Ball::setPos(int x, int y) {
@@ -171,7 +168,6 @@ sf::Vector3f rgbToHsv(sf::Color color) {
     return sf::Vector3f(h, s, v);
 }
 
-
 sf::Color hsvToRgb(sf::Vector3f hsv) {
     float h = hsv.x;
     float s = hsv.y;
@@ -204,7 +200,6 @@ sf::Color hsvToRgb(sf::Vector3f hsv) {
     );
 }
 
-
 sf::Color lerpColorHSV(sf::Color start, sf::Color end, float t) {
     sf::Vector3f startHSV = rgbToHsv(start);
     sf::Vector3f endHSV = rgbToHsv(end);
@@ -219,31 +214,28 @@ sf::Color lerpColorHSV(sf::Color start, sf::Color end, float t) {
 
 void Ball::updatePowerIndicator(float power, sf::Vector2f direction) {
     float arrowLength = power / 1500.0f;
-    arrowSprite.setScale(sf::Vector2f(arrowLength, arrowLength));
-    arrowSprite.setPosition(ballSprite.getPosition());
+    arrowSprite.setScale(sf::Vector2f(0.1f, 0.1f));
+    arrowSprite.setPosition(ballSprite.getPosition() + sf::Vector2f(5.0f, 5.0f));
     arrowSprite.setRotation(atan2(direction.y, direction.x) * 180 / 3.14159);
 
     if (power > 1500) {
         power = 1500;
     }
 
-    float maxPowerWidth = 100; // Fixed width for the power indicator
+    float maxPowerWidth = 100; 
     float powerWidth = (maxPowerWidth * power) / 1500.0f;
 
     sf::Vector2f position = ballSprite.getPosition();
-    float height = 10.0f; // Height of the power indicator
+    float height = 10.0f; 
 
-    // Define the four corners of the rectangle
-    powerIndicatorVertices[0].position = sf::Vector2f(position.x - maxPowerWidth / 2, position.y + ballSprite.getGlobalBounds().height / 2 + 19);
-    powerIndicatorVertices[1].position = sf::Vector2f(position.x - maxPowerWidth / 2 + powerWidth, position.y + ballSprite.getGlobalBounds().height / 2 + 19);
-    powerIndicatorVertices[2].position = sf::Vector2f(position.x - maxPowerWidth / 2 + powerWidth, position.y + ballSprite.getGlobalBounds().height / 2 + 19 + height);
-    powerIndicatorVertices[3].position = sf::Vector2f(position.x - maxPowerWidth / 2, position.y + ballSprite.getGlobalBounds().height / 2 + 19 + height);
+    powerIndicatorVertices[0].position = sf::Vector2f(position.x - maxPowerWidth / 2 + 5, position.y + ballSprite.getGlobalBounds().height / 2 + 16);
+    powerIndicatorVertices[1].position = sf::Vector2f(position.x - maxPowerWidth / 2 + 5 + powerWidth, position.y + ballSprite.getGlobalBounds().height / 2 + 16);
+    powerIndicatorVertices[2].position = sf::Vector2f(position.x - maxPowerWidth / 2 + 5 + powerWidth, position.y + ballSprite.getGlobalBounds().height / 2 + 15 + height);
+    powerIndicatorVertices[3].position = sf::Vector2f(position.x - maxPowerWidth / 2 + 5, position.y + ballSprite.getGlobalBounds().height / 2 + 15 + height);
 
-    // Calculate the color based on the power level (0.0 to 1.0)
     float t = power / 1500.0f;
     sf::Color color = lerpColorHSV(sf::Color::Green, sf::Color::Red, t);
 
-    // Set the color for all vertices
     powerIndicatorVertices[0].color = color;
     powerIndicatorVertices[1].color = color;
     powerIndicatorVertices[2].color = color;
@@ -253,4 +245,8 @@ void Ball::updatePowerIndicator(float power, sf::Vector2f direction) {
                                      ballSprite.getPosition().y + ballSprite.getGlobalBounds().height / 2 + 5);
 }
 
-
+void Ball::drawIndicator(sf::RenderWindow& window) {
+    window.draw(arrowSprite); 
+    window.draw(powerIndicatorBorder);
+    window.draw(&powerIndicatorVertices[0], powerIndicatorVertices.getVertexCount(), powerIndicatorVertices.getPrimitiveType()); 
+}

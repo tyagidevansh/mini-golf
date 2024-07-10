@@ -17,6 +17,8 @@ int main()
     GolfGame game(window);
     sf::Clock clock;
 
+    bool isPlaying = false;
+
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/background.jpg")) {
         return -1;
@@ -28,33 +30,48 @@ int main()
         float(height) / backgroundTexture.getSize().y
     );
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::MouseButtonPressed) {
-                game.handlePress(event);
+            if (event.type == sf::Event::KeyPressed) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+                    isPlaying = true;
+                }
             }
 
-            if (event.type == sf::Event::MouseButtonReleased) {
-                game.handleRelease(event);
-            }
+            if (isPlaying) {
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    game.handlePress(event);
+                }
 
-            if (event.type == sf::Event::MouseMoved) {
-                game.handleMouseMoved(event);
+                if (event.type == sf::Event::MouseButtonReleased) {
+                    game.handleRelease(event);
+                }
+
+                if (event.type == sf::Event::MouseMoved) {
+                    game.handleMouseMoved(event);
+                }
             }
         }
 
         float deltaTime = clock.restart().asSeconds();
+        static float elapsedTime = 0.0f;
+        elapsedTime += deltaTime;
 
         window.clear();
-        window.draw(backgroundSprite);
-        game.update(deltaTime, window);
-        game.draw(window);
+
+        if (isPlaying) {
+            window.draw(backgroundSprite);
+            game.update(deltaTime, window);
+            game.draw(window);
+        } else {
+            window.draw(backgroundSprite);
+            game.showTitleScreen(window, elapsedTime);
+        }
+
         window.display();
     }
 

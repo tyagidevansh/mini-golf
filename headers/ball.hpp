@@ -16,6 +16,7 @@ public:
     void setHoleStatus();
     void reset();
     void updatePowerIndicator(float power, sf::Vector2f direction);
+    void drawIndicator(sf::RenderWindow& window);
 
 private:
     sf::Vector2f initialPos;
