@@ -20,6 +20,8 @@ private:
   sf::Sprite obstacle;
   sf::Texture holeTexture;
   sf::Sprite hole;
+  sf::Texture flagTexture;
+  sf::Sprite flag;
 
 public:
   Map(int width, int height, sf::RenderWindow& window, const std::string& textureFile, const std::string& holeTextureFile);

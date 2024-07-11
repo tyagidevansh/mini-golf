@@ -4,7 +4,7 @@
 #include <SFML/System.hpp>
 
 GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
-    loadLevel("levels/level1.txt");
+    loadLevel("levels/level4.txt");
 
     if (!font.loadFromFile("assets/font.ttf")) {
         std::cerr << "Error opening font file";
@@ -13,12 +13,28 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
     strokeText.setFont(font);
     strokeText.setCharacterSize(32);
     strokeText.setFillColor(sf::Color::White);
-    strokeText.setPosition(10, 10);
+    strokeText.setPosition((window.getSize().x - strokeText.getLocalBounds().width - 110) / 2, 17); 
+
+    holeText.setFont(font);
+    holeText.setCharacterSize(32);
+    holeText.setFillColor(sf::Color::White);
+    holeText.setPosition((window.getSize().x - holeText.getLocalBounds().width - 80) / 2, 1017); 
+    holeText.setString("Hole : 1");
 
     levelUpText.setFont(font);
     levelUpText.setCharacterSize(48);
     levelUpText.setFillColor(sf::Color::White);
     levelUpText.setPosition(400, 300);
+
+    if (!splashBgTexture.loadFromFile("assets/splashBg.png")) {
+        std::cerr << "Error opening texture file";
+    }
+
+    splashBg.setTexture(splashBgTexture);
+    splashBg.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, -200); 
+
+    splashBg2.setTexture(splashBgTexture);
+    splashBg2.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, 800);
 }
 
 void GolfGame::draw(sf::RenderWindow& window) {
@@ -26,7 +42,12 @@ void GolfGame::draw(sf::RenderWindow& window) {
     ball.draw(window);
 
     strokeText.setString("Strokes: " + std::to_string(strokeCount));
+
+
+    window.draw(splashBg);
     window.draw(strokeText);
+    window.draw(splashBg2);
+    window.draw(holeText);
 }
 
 void GolfGame::handlePress(sf::Event& event) {
@@ -43,7 +64,7 @@ void GolfGame::handlePress(sf::Event& event) {
 }
 
 void GolfGame::handleRelease(sf::Event& event) {
-    if (event.mouseButton.button == sf::Mouse::Left and validClick) {
+    if (event.mouseButton.button == sf::Mouse::Left && validClick) {
         finalPos = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
         calculateVelocity();
         ball.move(velMagnitude, velDirection);
@@ -72,7 +93,7 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
     }
 
     if (!isMousePressed) {
-        ball.updatePowerIndicator(0, sf::Vector2f(0,0));
+        ball.updatePowerIndicator(0, sf::Vector2f(0, 0));
     } else {
         ball.drawIndicator(window);
     }
@@ -90,7 +111,6 @@ void GolfGame::calculateVelocity() {
     if (velMagnitude != 0) {
         velDirection /= velMagnitude;
     }
-    //std::cout << velMagnitude << std::endl;
 }
 
 void GolfGame::handleLevelUp(sf::RenderWindow& window) {
@@ -99,11 +119,11 @@ void GolfGame::handleLevelUp(sf::RenderWindow& window) {
     curLevel++;
     if (curLevel <= 4) {
         loadLevel("levels/level" + std::to_string(curLevel) + ".txt");
-    }
-    else {
+    } else {
         exit(0);
     }
-    ball.updatePowerIndicator(0, sf::Vector2f(0,0));
+    ball.updatePowerIndicator(0, sf::Vector2f(0, 0));
+    holeText.setString("Hole : " + std::to_string(curLevel));
 }
 
 void GolfGame::displayLevelUpText(sf::RenderWindow& window) {
@@ -119,17 +139,24 @@ void GolfGame::showTitleScreen(sf::RenderWindow& window, float elapsedTime) {
     }
 
     sf::Sprite titleSprite(titleTexture);
-    titleSprite.setPosition(620, 300);
+    titleSprite.setPosition(500, 150);
     window.draw(titleSprite);
 
-    float amplitude = 10.0f;
+    float amplitude = 15.0f;
     float frequency = 2.0f;
     float offset = amplitude * std::sin(frequency * elapsedTime);
 
     titleText.setFont(font);
-    titleText.setCharacterSize(48);
+    titleText.setCharacterSize(54);
     titleText.setFillColor(sf::Color::White);
-    titleText.setPosition(800, 700 + offset);
+    titleText.setPosition(790, 700 + offset);
     titleText.setString("Press Enter To Play!");
     window.draw(titleText);
+
+    bottomText.setFont(font);
+    bottomText.setCharacterSize(40);
+    bottomText.setFillColor(sf::Color::White);
+    bottomText.setPosition(150, 1000);
+    bottomText.setString("Hold ESC to exit   |   Aim the ball using your mouse to score in fewest strokes   |   Made by @tyagidevansh");
+    window.draw(bottomText);
 }

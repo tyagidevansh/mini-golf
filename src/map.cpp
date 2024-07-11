@@ -23,6 +23,14 @@ Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obs
   float holeScaleFactor = static_cast<float>(cellSize) / holeTexture.getSize().x; 
   hole.setScale(holeScaleFactor / 2, holeScaleFactor / 2);
   //hole.setOrigin(cellSize / 2, cellSize / 2);
+
+  if (!flagTexture.loadFromFile("assets/flag.png")) {
+    std::cerr << "Error loading flag texture";
+  }
+
+  flag.setTexture(flagTexture);
+  float flagScaleFactor = 0.2f;
+  flag.setScale(flagScaleFactor, flagScaleFactor);
 }
 
 void Map::loadMap(const std::vector<std::vector<int>>& mapData) {
@@ -58,7 +66,9 @@ void Map::draw() {
         window.draw(obstacle);
       } else if (grid[y][x] == HOLE) {
         hole.setPosition(x * cellSize, y * cellSize);
+        flag.setPosition(x * cellSize + 10, y * cellSize - 40);
         window.draw(hole);
+        window.draw(flag);
       }
     }
   }
