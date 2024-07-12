@@ -4,7 +4,7 @@
 #include <SFML/System.hpp>
 
 GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
-    loadLevel("levels/level4.txt");
+    loadLevel("levels/level5.txt");
 
     if (!font.loadFromFile("assets/font.ttf")) {
         std::cerr << "Error opening font file";
@@ -103,6 +103,10 @@ void GolfGame::loadLevel(const std::string& filePath) {
     map.loadMapFromFile(filePath);
     ball.reset();
     strokeCount = 0;
+
+    if (curLevel == 4) {
+        ball.setPos(200, 560);
+    }
 }
 
 void GolfGame::calculateVelocity() {

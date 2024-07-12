@@ -115,6 +115,12 @@ void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
             newPos = pos;
         }
 
+        if (map.isSand(newPos.x, newPos.y)) {
+            friction = 100.0f;
+        } else {
+            friction = 1.0f;
+        }
+
         if (map.isHole(newPos.x, newPos.y)) {
             velMagnitude = 0;
             newPos = map.getHoleCenter();

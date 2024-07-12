@@ -9,6 +9,7 @@ enum CellType {
   OBSTACLE,
   SAND,
   HOLE,
+  WATER,
 };
 
 class Map {
@@ -22,6 +23,17 @@ private:
   sf::Sprite hole;
   sf::Texture flagTexture;
   sf::Sprite flag;
+  sf::Texture sandTexture;
+  sf::Sprite sand;
+  std::vector<sf::Texture> waterTextures;
+  std::vector<sf::Sprite> waterSprites;
+  int currentWaterFrame;
+  float animationTimer;
+  float animationSpeed;
+
+  sf::Texture waterTexture;  // Base water texture
+  sf::Sprite waterSprite;
+  sf::Shader waterShader;    // Shader for water effect
 
 public:
   Map(int width, int height, sf::RenderWindow& window, const std::string& textureFile, const std::string& holeTextureFile);
@@ -29,6 +41,7 @@ public:
   void loadMapFromFile(const std::string& filePath);
   void draw();
   bool isObstacle(int x, int y);
+  bool isSand(int x, int y);
   bool isHole(int x, int y);
   sf::Vector2f getHoleCenter();
   sf::Vector2i getCellCoords(sf::Vector2f position);

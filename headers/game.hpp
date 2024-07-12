@@ -24,7 +24,7 @@ private:
     sf::Text holeText;
     sf::Text levelUpText;
     int strokeCount = 0;
-    int curLevel = 1;
+    int curLevel = 5;
     bool validClick = false;
     bool isMousePressed = false;
     sf::Vector2f initialPos;
@@ -34,7 +34,6 @@ private:
     sf::Texture titleTexture;
     sf::Sprite titleSprite;
     sf::Text titleText;
-    //sf::Text holeText;
     sf::Text bottomText;
     sf::Texture splashBgTexture;
     sf::Sprite splashBg;
