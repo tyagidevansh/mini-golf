@@ -42,6 +42,7 @@ public:
   void draw();
   bool isObstacle(int x, int y);
   bool isSand(int x, int y);
+  bool isWater(int x, int y);
   bool isHole(int x, int y);
   sf::Vector2f getHoleCenter();
   sf::Vector2i getCellCoords(sf::Vector2f position);

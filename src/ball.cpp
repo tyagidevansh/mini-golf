@@ -14,6 +14,7 @@ Ball::Ball(int x, int y, int radius, const std::string& ballTextureFile, const s
     scaleFactor = static_cast<float>(radius * 2) / ballTexture.getSize().x;
     ballSprite.setScale(scaleFactor, scaleFactor);
     ballSprite.setOrigin(radius, radius);
+    scalingOnScore = scaleFactor;
 
     if (!arrowTexture.loadFromFile(arrowTextureFile)) {
         std::cerr << "Error loading arrow texture" << std::endl;
@@ -56,80 +57,107 @@ void Ball::move(float velMagnitude, sf::Vector2f velDirection) {
 }
 
 void Ball::update(float deltaTime, const sf::RenderWindow& window, Map& map) {
-    float scalingOnScore = scaleFactor;
     if (scaling) {
-        while (scalingOnScore != 0) {
-            scalingOnScore -= deltaTime;
-            if (scalingOnScore <= 0) {
-                scalingOnScore = 0;
-            }
-            ballSprite.setScale(scaleFactor * scalingOnScore, scaleFactor * scalingOnScore);
+        updateScaling(deltaTime);
+    } else if (velMagnitude > 0) {
+        updatePosition(deltaTime, window, map);
+    }
+}
+
+void Ball::updateScaling(float deltaTime) {
+    if (scalingOnScore > 0) {
+        float progress = scalingOnScore / scaleFactor;
+        float easedProgress = progress * progress * (3 - 2 * progress); // cubic ease out for smoothness
+
+        scalingOnScore -= deltaTime;
+        if (scalingOnScore <= 0) {
+            scalingOnScore = 0;
         }
-        sf::sleep(sf::seconds(1));
+
+        ballSprite.setScale(scaleFactor * easedProgress, scaleFactor * easedProgress);
+    } else {
+        isHoleComplete = true;
+        reset();
+    }
+}
+
+void Ball::updatePosition(float deltaTime, const sf::RenderWindow& window, Map& map) {
+    sf::Vector2f pos = ballSprite.getPosition();
+    sf::Vector2f newPos = pos + velDirection * velMagnitude * deltaTime;
+
+    velMagnitude -= friction * velMagnitude * deltaTime;
+    if (velMagnitude < 0) velMagnitude = 0;
+
+    handleWindowCollisions(newPos, window);
+    handleObstacleCollisions(newPos, pos, map);
+
+    if (map.isSand(newPos.x, newPos.y)) {
+        friction = 100.0f;
+    } else {
+        friction = 1.0f;
     }
 
-    if (velMagnitude > 0) {
-        sf::Vector2f pos = ballSprite.getPosition();
-        sf::Vector2f newPos = pos + velDirection * velMagnitude * deltaTime;
-
-        velMagnitude -= friction * velMagnitude * deltaTime;
-        if (velMagnitude < 0) velMagnitude = 0; 
-
-        sf::Vector2u windowSize = window.getSize();
-
-        if (newPos.x < 0) {
-            newPos.x = 0;
-            velDirection.x = -velDirection.x;
-        }
-        if (newPos.x > windowSize.x - ballSprite.getGlobalBounds().width) { 
-            newPos.x = windowSize.x - ballSprite.getGlobalBounds().width;
-            velDirection.x = -velDirection.x;   
-        }
-        if (newPos.y < 0) {
-            newPos.y = 0;
-            velDirection.y = -velDirection.y;
-        }
-        if (newPos.y > windowSize.y - ballSprite.getGlobalBounds().height) {
-            newPos.y = windowSize.y - ballSprite.getGlobalBounds().height;
-            velDirection.y = -velDirection.y;
-        }
-
-        float ballRadius = ballSprite.getGlobalBounds().width / 2;
-
-        if (map.isObstacle(newPos.x - ballRadius, pos.y) || map.isObstacle(newPos.x + ballRadius, pos.y)) {
-            velDirection.x = -velDirection.x;
-            newPos.x = pos.x;
-        }
-
-        if (map.isObstacle(pos.x, newPos.y - ballRadius) || map.isObstacle(pos.x, newPos.y + ballRadius)) {
-            velDirection.y = -velDirection.y;
-            newPos.y = pos.y;
-        }
-
-        if (map.isObstacle(newPos.x - ballRadius, newPos.y - ballRadius) || 
-            map.isObstacle(newPos.x + ballRadius, newPos.y - ballRadius) ||
-            map.isObstacle(newPos.x - ballRadius, newPos.y + ballRadius) ||
-            map.isObstacle(newPos.x + ballRadius, newPos.y + ballRadius)) {
-            velDirection.x = -velDirection.x;
-            velDirection.y = -velDirection.y;
-            newPos = pos;
-        }
-
-        if (map.isSand(newPos.x, newPos.y)) {
-            friction = 100.0f;
-        } else {
-            friction = 1.0f;
-        }
-
-        if (map.isHole(newPos.x, newPos.y)) {
-            velMagnitude = 0;
-            newPos = map.getHoleCenter();
-            scaling = true;
-            isHoleComplete = true;
-        }
-
-        ballSprite.setPosition(newPos);
+    if (map.isWater(newPos.x, newPos.y)) {
+        newPos = previousPos;
+        velMagnitude = 0;
     }
+
+    if (map.isHole(newPos.x, newPos.y)) {
+        velMagnitude = 0;
+        newPos = map.getHoleCenter();
+        scaling = true;
+    }
+
+    ballSprite.setPosition(newPos);
+}
+
+void Ball::handleWindowCollisions(sf::Vector2f& newPos, const sf::RenderWindow& window) {
+    sf::Vector2u windowSize = window.getSize();
+    float ballWidth = ballSprite.getGlobalBounds().width;
+    float ballHeight = ballSprite.getGlobalBounds().height;
+
+    if (newPos.x < 0) {
+        newPos.x = 0;
+        velDirection.x = -velDirection.x;
+    } else if (newPos.x > windowSize.x - ballWidth) {
+        newPos.x = windowSize.x - ballWidth;
+        velDirection.x = -velDirection.x;
+    }
+
+    if (newPos.y < 0) {
+        newPos.y = 0;
+        velDirection.y = -velDirection.y;
+    } else if (newPos.y > windowSize.y - ballHeight) {
+        newPos.y = windowSize.y - ballHeight;
+        velDirection.y = -velDirection.y;
+    }
+}
+
+void Ball::handleObstacleCollisions(sf::Vector2f& newPos, const sf::Vector2f& pos, Map& map) {
+    float ballRadius = ballSprite.getGlobalBounds().width / 2;
+
+    if (map.isObstacle(newPos.x - ballRadius, pos.y) || map.isObstacle(newPos.x + ballRadius, pos.y)) {
+        velDirection.x = -velDirection.x;
+        newPos.x = pos.x;
+    }
+
+    if (map.isObstacle(pos.x, newPos.y - ballRadius) || map.isObstacle(pos.x, newPos.y + ballRadius)) {
+        velDirection.y = -velDirection.y;
+        newPos.y = pos.y;
+    }
+
+    if (map.isObstacle(newPos.x - ballRadius, newPos.y - ballRadius) || 
+        map.isObstacle(newPos.x + ballRadius, newPos.y - ballRadius) ||
+        map.isObstacle(newPos.x - ballRadius, newPos.y + ballRadius) ||
+        map.isObstacle(newPos.x + ballRadius, newPos.y + ballRadius)) {
+        velDirection.x = -velDirection.x;
+        velDirection.y = -velDirection.y;
+        newPos = pos;
+    }
+}
+
+void Ball::handleWaterCollisions(sf::Vector2f pos) {
+    
 }
 
 bool Ball::getHoleStatus() {
@@ -143,6 +171,7 @@ void Ball::setHoleStatus() {
 void Ball::reset() {
     ballSprite.setPosition(initialPos.x, initialPos.y);
     scaling = false;
+    scalingOnScore = scaleFactor;
     ballSprite.setScale(scaleFactor, scaleFactor);
 }
 
@@ -255,4 +284,8 @@ void Ball::drawIndicator(sf::RenderWindow& window) {
     window.draw(arrowSprite); 
     window.draw(powerIndicatorBorder);
     window.draw(&powerIndicatorVertices[0], powerIndicatorVertices.getVertexCount(), powerIndicatorVertices.getPrimitiveType()); 
+}
+
+void Ball::updatePreviousPos(sf::Vector2f pos) {
+    previousPos = pos;
 }

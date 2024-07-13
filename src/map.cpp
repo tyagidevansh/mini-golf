@@ -6,7 +6,6 @@
 Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obstacleTextureFile, const std::string& holeTextureFile)
     : grid(height, std::vector<int>(width, EMPTY)), window(window), currentWaterFrame(0), animationTimer(0.0f), animationSpeed(0.0001f) {
 
-    // Load obstacle texture
     if (!obstacleTexture.loadFromFile(obstacleTextureFile)) {
         std::cerr << "Error loading obstacle texture from " << obstacleTextureFile << std::endl;
     } else {
@@ -17,7 +16,6 @@ Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obs
         obstacle.setOrigin(cellSize / 2, cellSize / 2);
     }
 
-    // Load sand texture
     if (!sandTexture.loadFromFile("assets/sand.jpg")) {
         std::cerr << "Error loading sand texture from assets/sand.jpg" << std::endl;
     } else {
@@ -27,17 +25,15 @@ Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obs
         sand.setOrigin(cellSize / 2, cellSize / 2);
     }
 
-    // Load hole texture
     if (!holeTexture.loadFromFile(holeTextureFile)) {
         std::cerr << "Error loading hole texture from " << holeTextureFile << std::endl;
     } else {
         hole.setTexture(holeTexture);
         float holeScaleFactor = static_cast<float>(cellSize) / holeTexture.getSize().x;
         hole.setScale(holeScaleFactor / 2, holeScaleFactor / 2);
-        hole.setOrigin(cellSize / 2, cellSize / 2);
+        //hole.setOrigin(cellSize / 2, cellSize / 2);
     }
 
-    // Load flag texture
     if (!flagTexture.loadFromFile("assets/flag.png")) {
         std::cerr << "Error loading flag texture from assets/flag.png" << std::endl;
     } else {
@@ -46,14 +42,12 @@ Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obs
         flag.setScale(flagScaleFactor, flagScaleFactor);
     }
 
-    // Load water shader
-    if (!waterShader.loadFromFile("assets/water.frag", sf::Shader::Fragment)) {
+    if (!waterShader.loadFromFile("shaders/water.frag", sf::Shader::Fragment)) {
         std::cerr << "Error loading water shader from assets/water.frag" << std::endl;
     } else {
         std::cout << "Water shader loaded successfully" << std::endl;
     }
 
-    // Load a base texture for water (e.g., a plain blue texture)
     if (!waterTexture.loadFromFile("assets/water_base.png")) {
         std::cerr << "Error loading water base texture from assets/water_base.jpg" << std::endl;
     } else {
@@ -132,6 +126,15 @@ bool Map::isSand(int x, int y) {
         return false;
     }
     return grid[gridY][gridX] == SAND;
+}
+
+bool Map::isWater(int x, int y) {
+    int gridX = x / cellSize;
+    int gridY = y / cellSize;
+    if (gridX < 0 || gridX >= grid[0].size() || gridY < 0 || gridY >= grid.size()) {
+        return false;
+    }
+    return grid[gridY][gridX] == WATER;
 }
 
 bool Map::isHole(int x, int y) {

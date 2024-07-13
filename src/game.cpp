@@ -38,11 +38,10 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
 }
 
 void GolfGame::draw(sf::RenderWindow& window) {
-    map.draw();
+    //map.draw(); //removed draw from here so that the map can be drawn before the indicator to avoid it being hidden under the sand, possibly causing some nonsensical performance issues?
     ball.draw(window);
 
     strokeText.setString("Strokes: " + std::to_string(strokeCount));
-
 
     window.draw(splashBg);
     window.draw(strokeText);
@@ -70,6 +69,7 @@ void GolfGame::handleRelease(sf::Event& event) {
         ball.move(velMagnitude, velDirection);
         strokeCount++;
         isMousePressed = false; 
+        ball.updatePreviousPos(initialPos);
     }
 }
 
@@ -91,6 +91,8 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
         handleLevelUp(window);
         ball.setHoleStatus();
     }
+
+    map.draw(); //aware that having the main draw out of the draw function is stupid but it works
 
     if (!isMousePressed) {
         ball.updatePowerIndicator(0, sf::Vector2f(0, 0));
@@ -121,7 +123,7 @@ void GolfGame::handleLevelUp(sf::RenderWindow& window) {
     displayLevelUpText(window);
     sf::sleep(sf::seconds(1));
     curLevel++;
-    if (curLevel <= 4) {
+    if (curLevel <= 6) {
         loadLevel("levels/level" + std::to_string(curLevel) + ".txt");
     } else {
         exit(0);

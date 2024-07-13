@@ -3,9 +3,12 @@ uniform vec2 resolution;
 uniform sampler2D texture;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
-    float wave = sin(uv.x * 10.0 + time) * 0.2;
-    uv.y += wave;
+    vec2 uv = gl_TexCoord[0].xy;
+
+    uv.y += 0.05 * sin(uv.x * 20.0 + time * 10.0);
+    uv.x += 0.05 * cos(uv.y * 20.0 + time * 10.0);
+
     vec4 color = texture2D(texture, uv);
+
     gl_FragColor = color;
 }
