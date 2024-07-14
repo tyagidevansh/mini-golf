@@ -101,7 +101,7 @@ void Map::draw() {
                 window.draw(flag);
             } else if (grid[y][x] == WATER) {
                 waterShader.setUniform("time", time);
-                waterShader.setUniform("resolution", sf::Vector2f(window.getSize()));
+                //waterShader.setUniform("resolution", sf::Vector2f(window.getSize()));
                 waterShader.setUniform("texture", sf::Shader::CurrentTexture);
                 waterSprite.setPosition(x * cellSize, y * cellSize);
                 window.draw(waterSprite, &waterShader);

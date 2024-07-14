@@ -16,7 +16,6 @@ public:
     void updateScaling(float deltaTime);
     void handleWindowCollisions(sf::Vector2f& newPos, const sf::RenderWindow& window);
     void handleObstacleCollisions(sf::Vector2f& newPos, const sf::Vector2f& pos, Map& map);
-    void handleWaterCollisions(sf::Vector2f newPos);
     bool getHoleStatus();
     void setHoleStatus();
     void reset();
@@ -38,6 +37,8 @@ private:
     float arrowScaleFactor;
     bool scaling;
     float scalingOnScore;
+    float scalingOnWater;
+    bool isWater = false;
     bool isHoleComplete = false;
     sf::RectangleShape powerIndicator; 
     sf::RectangleShape powerIndicatorBorder;

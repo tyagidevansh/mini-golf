@@ -4,7 +4,7 @@
 #include <SFML/System.hpp>
 
 GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
-    loadLevel("levels/level5.txt");
+    loadLevel("levels/level10.txt");
 
     if (!font.loadFromFile("assets/font.ttf")) {
         std::cerr << "Error opening font file";
@@ -22,9 +22,9 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
     holeText.setString("Hole : 1");
 
     levelUpText.setFont(font);
-    levelUpText.setCharacterSize(48);
+    levelUpText.setCharacterSize(55);
     levelUpText.setFillColor(sf::Color::White);
-    levelUpText.setPosition(400, 300);
+    levelUpText.setPosition(750, 500);
 
     if (!splashBgTexture.loadFromFile("assets/splashBg.png")) {
         std::cerr << "Error opening texture file";
@@ -35,6 +35,31 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
 
     splashBg2.setTexture(splashBgTexture);
     splashBg2.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, 800);
+
+    if (!starTexture.loadFromFile("assets/star.png")) {
+        std::cerr << "Error opening texture file";
+    }
+
+    float starScale = 0.25f;
+    star1.setTexture(starTexture);
+    star1.setPosition(700, 300); 
+    star1.setScale(starScale, starScale);
+
+    star2.setTexture(starTexture);
+    star2.setPosition(900, 300); 
+    star2.setScale(starScale, starScale);
+
+    star3.setTexture(starTexture);
+    star3.setPosition(1100, 300); 
+    star3.setScale(starScale, starScale);
+
+    if (!boardTexture.loadFromFile("assets/board.png")) {
+        std::cerr << "Error loading texture file";
+    }
+
+    board.setTexture(boardTexture);
+    board.setPosition(650, 450);
+    
 }
 
 void GolfGame::draw(sf::RenderWindow& window) {
@@ -91,8 +116,8 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
         handleLevelUp(window);
         ball.setHoleStatus();
     }
-
-    map.draw(); //aware that having the main draw out of the draw function is stupid but it works
+    
+    map.draw(); 
 
     if (!isMousePressed) {
         ball.updatePowerIndicator(0, sf::Vector2f(0, 0));
@@ -101,6 +126,7 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
     }
 }
 
+
 void GolfGame::loadLevel(const std::string& filePath) {
     map.loadMapFromFile(filePath);
     ball.reset();
@@ -108,6 +134,14 @@ void GolfGame::loadLevel(const std::string& filePath) {
 
     if (curLevel == 4) {
         ball.setPos(200, 560);
+    } else if (curLevel == 5) {
+       ball.setPos(390, 560);
+    } else if (curLevel == 7) {
+        ball.setPos(40, 1000);
+    } else if (curLevel == 8 || curLevel == 9) {
+        ball.setPos(40, 40);
+    } else if (curLevel == 10) {
+        ball.setPos(80, 920);
     }
 }
 
@@ -121,9 +155,9 @@ void GolfGame::calculateVelocity() {
 
 void GolfGame::handleLevelUp(sf::RenderWindow& window) {
     displayLevelUpText(window);
-    sf::sleep(sf::seconds(1));
+    sf::sleep(sf::seconds(3));
     curLevel++;
-    if (curLevel <= 6) {
+    if (curLevel <= 10) {
         loadLevel("levels/level" + std::to_string(curLevel) + ".txt");
     } else {
         exit(0);
@@ -133,7 +167,14 @@ void GolfGame::handleLevelUp(sf::RenderWindow& window) {
 }
 
 void GolfGame::displayLevelUpText(sf::RenderWindow& window) {
-    levelUpText.setString("Hole complete!");
+    
+    window.draw(star1);
+    if (strokeCount < 5) window.draw(star2);
+    if (strokeCount < 3) window.draw(star3);
+
+    window.draw(board);
+    totalStrokes += strokeCount;
+    levelUpText.setString("Level completed! \n Strokes : " + std::to_string(strokeCount) + " \n Total Stokes: " + std::to_string(totalStrokes));
     window.draw(levelUpText);
     window.display();
 }
@@ -163,6 +204,6 @@ void GolfGame::showTitleScreen(sf::RenderWindow& window, float elapsedTime) {
     bottomText.setCharacterSize(40);
     bottomText.setFillColor(sf::Color::White);
     bottomText.setPosition(150, 1000);
-    bottomText.setString("Hold ESC to exit   |   Aim the ball using your mouse to score in fewest strokes   |   Made by @tyagidevansh");
+    bottomText.setString("Press ESC to exit   |   Aim the ball using your mouse to score in fewest strokes   |   Made by @tyagidevansh");
     window.draw(bottomText);
 }

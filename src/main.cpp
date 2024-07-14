@@ -40,6 +40,10 @@ int main()
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
                     isPlaying = true;
                 }
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                    window.close();
+                }
             }
 
             if (isPlaying) {

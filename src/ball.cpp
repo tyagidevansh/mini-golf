@@ -39,8 +39,6 @@ Ball::Ball(int x, int y, int radius, const std::string& ballTextureFile, const s
 
 void Ball::draw(sf::RenderWindow& window) {
     window.draw(ballSprite);
-    // window.draw(powerIndicatorBorder); 
-    // window.draw(powerIndicator); 
 }
 
 void Ball::setPos(int x, int y) {
@@ -74,8 +72,18 @@ void Ball::updateScaling(float deltaTime) {
             scalingOnScore = 0;
         }
 
+        if (isWater) {
+            ballSprite.setPosition(ballSprite.getPosition().x + velDirection.x * 0.25, ballSprite.getPosition().y + velDirection.y * 0.25);
+        }
+
         ballSprite.setScale(scaleFactor * easedProgress, scaleFactor * easedProgress);
-    } else {
+    } else if (isWater){
+        isWater = false;
+        ballSprite.setPosition(previousPos);
+        scaling = false;
+        ballSprite.setScale(scaleFactor, scaleFactor);
+        scalingOnScore = scaleFactor;
+    }else {
         isHoleComplete = true;
         reset();
     }
@@ -98,8 +106,10 @@ void Ball::updatePosition(float deltaTime, const sf::RenderWindow& window, Map& 
     }
 
     if (map.isWater(newPos.x, newPos.y)) {
-        newPos = previousPos;
+        ballSprite.setPosition(newPos.x + 15, newPos.y + 15);
         velMagnitude = 0;
+        isWater = true;
+        scaling = true;
     }
 
     if (map.isHole(newPos.x, newPos.y)) {
@@ -154,10 +164,6 @@ void Ball::handleObstacleCollisions(sf::Vector2f& newPos, const sf::Vector2f& po
         velDirection.y = -velDirection.y;
         newPos = pos;
     }
-}
-
-void Ball::handleWaterCollisions(sf::Vector2f pos) {
-    
 }
 
 bool Ball::getHoleStatus() {
