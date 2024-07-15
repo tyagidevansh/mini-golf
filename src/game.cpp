@@ -3,35 +3,32 @@
 #include <iostream>
 #include <SFML/System.hpp>
 
-GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
-    loadLevel("levels/level10.txt");
+GolfGame::GolfGame(sf::RenderWindow& window) 
+    : ball(390, 500, 10, "assets/golfBall.png", "assets/arrow.png"), 
+      map(18, 32, window, "assets/obstacle.png", "assets/hole.png") {
+    loadLevel("levels/level1.txt");
 
     if (!font.loadFromFile("assets/font.ttf")) {
         std::cerr << "Error opening font file";
     }
 
-    strokeText.setFont(font);
-    strokeText.setCharacterSize(32);
-    strokeText.setFillColor(sf::Color::White);
-    strokeText.setPosition((window.getSize().x - strokeText.getLocalBounds().width - 110) / 2, 17); 
+    if (!bgMusic.openFromFile("assets/bg.ogg")) {
+        std::cerr << "Failed to load background music" << std::endl;
+    }
 
-    holeText.setFont(font);
-    holeText.setCharacterSize(32);
-    holeText.setFillColor(sf::Color::White);
-    holeText.setPosition((window.getSize().x - holeText.getLocalBounds().width - 80) / 2, 1017); 
-    holeText.setString("Hole : 1");
+    if (!scoreSoundBuffer.loadFromFile("assets/clap.ogg")) {
+        std::cerr << "Failed to load score sound effect" << std::endl;
+    }
+    scoreSound.setBuffer(scoreSoundBuffer);    
 
-    levelUpText.setFont(font);
-    levelUpText.setCharacterSize(55);
-    levelUpText.setFillColor(sf::Color::White);
-    levelUpText.setPosition(750, 500);
+    updateTextPositions(window);
 
     if (!splashBgTexture.loadFromFile("assets/splashBg.png")) {
         std::cerr << "Error opening texture file";
     }
 
     splashBg.setTexture(splashBgTexture);
-    splashBg.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, -200); 
+    splashBg.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, -200);
 
     splashBg2.setTexture(splashBgTexture);
     splashBg2.setPosition((window.getSize().x - splashBg.getLocalBounds().width) / 2, 800);
@@ -42,15 +39,15 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
 
     float starScale = 0.25f;
     star1.setTexture(starTexture);
-    star1.setPosition(700, 300); 
+    star1.setPosition(window.getSize().x * 0.3f, window.getSize().y * 0.3f);
     star1.setScale(starScale, starScale);
 
     star2.setTexture(starTexture);
-    star2.setPosition(900, 300); 
+    star2.setPosition(window.getSize().x * 0.42f, window.getSize().y * 0.3f);
     star2.setScale(starScale, starScale);
 
     star3.setTexture(starTexture);
-    star3.setPosition(1100, 300); 
+    star3.setPosition(window.getSize().x * 0.54f, window.getSize().y * 0.3f);
     star3.setScale(starScale, starScale);
 
     if (!boardTexture.loadFromFile("assets/board.png")) {
@@ -58,12 +55,35 @@ GolfGame::GolfGame(sf::RenderWindow& window) : ball(390, 500, 10, "assets/golfBa
     }
 
     board.setTexture(boardTexture);
-    board.setPosition(650, 450);
-    
+    board.setPosition(window.getSize().x * 0.3f, window.getSize().y * 0.45f);
+
+    bgMusic.setVolume(20);
+    bgMusic.play();
+    bgMusic.setLoop(true);
+}
+
+void GolfGame::updateTextPositions(const sf::RenderWindow& window) {
+    float windowWidth = static_cast<float>(window.getSize().x);
+    float windowHeight = static_cast<float>(window.getSize().y);
+
+    strokeText.setFont(font);
+    strokeText.setCharacterSize(32);
+    strokeText.setFillColor(sf::Color::White);
+    strokeText.setPosition((windowWidth - strokeText.getLocalBounds().width - 110) / 2, windowHeight * 0.017f);
+
+    holeText.setFont(font);
+    holeText.setCharacterSize(32);
+    holeText.setFillColor(sf::Color::White);
+    holeText.setPosition((windowWidth - holeText.getLocalBounds().width - 80) / 2, windowHeight * 0.945f);
+    holeText.setString("Hole : 1");
+
+    levelUpText.setFont(font);
+    levelUpText.setCharacterSize(55);
+    levelUpText.setFillColor(sf::Color::White);
+    levelUpText.setPosition(windowWidth * 0.35f, windowHeight * 0.5f);
 }
 
 void GolfGame::draw(sf::RenderWindow& window) {
-    //map.draw(); //removed draw from here so that the map can be drawn before the indicator to avoid it being hidden under the sand, possibly causing some nonsensical performance issues?
     ball.draw(window);
 
     strokeText.setString("Strokes: " + std::to_string(strokeCount));
@@ -113,6 +133,8 @@ void GolfGame::handleMouseMoved(sf::Event& event) {
 void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
     ball.update(deltaTime, window, map);
     if (ball.getHoleStatus()) {
+       // bgMusic.pause();
+        scoreSound.play();
         handleLevelUp(window);
         ball.setHoleStatus();
     }
@@ -126,8 +148,8 @@ void GolfGame::update(float deltaTime, sf::RenderWindow& window) {
     }
 }
 
-
 void GolfGame::loadLevel(const std::string& filePath) {
+    bgMusic.play();
     map.loadMapFromFile(filePath);
     ball.reset();
     strokeCount = 0;
@@ -160,6 +182,9 @@ void GolfGame::handleLevelUp(sf::RenderWindow& window) {
     if (curLevel <= 10) {
         loadLevel("levels/level" + std::to_string(curLevel) + ".txt");
     } else {
+        window.clear();
+        showEndScreen(window);
+        sf::sleep(sf::seconds(10));
         exit(0);
     }
     ball.updatePowerIndicator(0, sf::Vector2f(0, 0));
@@ -167,7 +192,6 @@ void GolfGame::handleLevelUp(sf::RenderWindow& window) {
 }
 
 void GolfGame::displayLevelUpText(sf::RenderWindow& window) {
-    
     window.draw(star1);
     if (strokeCount < 5) window.draw(star2);
     if (strokeCount < 3) window.draw(star3);
@@ -186,7 +210,7 @@ void GolfGame::showTitleScreen(sf::RenderWindow& window, float elapsedTime) {
     }
 
     sf::Sprite titleSprite(titleTexture);
-    titleSprite.setPosition(500, 150);
+    titleSprite.setPosition(window.getSize().x * 0.5f - titleTexture.getSize().x * 0.5f, window.getSize().y * 0.15f);
     window.draw(titleSprite);
 
     float amplitude = 15.0f;
@@ -196,14 +220,42 @@ void GolfGame::showTitleScreen(sf::RenderWindow& window, float elapsedTime) {
     titleText.setFont(font);
     titleText.setCharacterSize(54);
     titleText.setFillColor(sf::Color::White);
-    titleText.setPosition(790, 700 + offset);
+    titleText.setPosition(window.getSize().x * 0.5f - titleText.getLocalBounds().width * 0.5f, window.getSize().y * 0.7f + offset);
     titleText.setString("Press Enter To Play!");
     window.draw(titleText);
 
     bottomText.setFont(font);
     bottomText.setCharacterSize(40);
     bottomText.setFillColor(sf::Color::White);
-    bottomText.setPosition(150, 1000);
+    bottomText.setPosition(window.getSize().x * 0.1f, window.getSize().y * 0.9f);
     bottomText.setString("Press ESC to exit   |   Aim the ball using your mouse to score in fewest strokes   |   Made by @tyagidevansh");
     window.draw(bottomText);
+}
+
+void GolfGame::showEndScreen(sf::RenderWindow& window) {
+    sf::Text endText;
+    endText.setFont(font);
+    endText.setCharacterSize(48);
+    endText.setFillColor(sf::Color::White);
+    endText.setString("You have completed all the levels! \n Total Strokes : " + std::to_string(totalStrokes));
+    endText.setPosition((window.getSize().x - endText.getLocalBounds().width) / 2, window.getSize().y * 0.4f);
+
+    sf::Text screenshotText;
+    screenshotText.setFont(font);
+    screenshotText.setCharacterSize(36);
+    screenshotText.setFillColor(sf::Color::White);
+    screenshotText.setString("If you did well, take a screenshot of total strokes and send it to me!");
+    screenshotText.setPosition((window.getSize().x - screenshotText.getLocalBounds().width) / 2, window.getSize().y * 0.55f);
+
+    sf::Text closeText;
+    closeText.setFont(font);
+    closeText.setCharacterSize(30);
+    closeText.setFillColor(sf::Color::White);
+    closeText.setString("Game will auto-exit in a few seconds");
+    closeText.setPosition((window.getSize().x - closeText.getLocalBounds().width) / 2, window.getSize().y * 0.7f);
+
+    window.draw(endText);
+    window.draw(screenshotText);
+    window.draw(closeText);
+    window.display();
 }

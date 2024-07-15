@@ -1,6 +1,7 @@
 #include "../headers/ball.hpp"
 #include "../headers/map.hpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 class GolfGame {
 public:
@@ -15,8 +16,14 @@ public:
     void handleLevelUp(sf::RenderWindow& window);
     void displayLevelUpText(sf::RenderWindow& window);
     void showTitleScreen(sf::RenderWindow& window, float elapsedTime);
+    void showEndScreen(sf::RenderWindow& window);
 
 private:
+    void updateTextPositions(const sf::RenderWindow& window);
+    void playBackgroundMusic();
+    void stopBackgroundMusic();
+    void playScoreSound();
+
     Ball ball;
     Map map;
     sf::Font font;
@@ -25,7 +32,7 @@ private:
     sf::Text levelUpText;
     int strokeCount = 0;
     int totalStrokes = 0;
-    int curLevel = 10;
+    int curLevel = 1;
     bool validClick = false;
     bool isMousePressed = false;
     sf::Vector2f initialPos;
@@ -45,4 +52,7 @@ private:
     sf::Sprite star3;
     sf::Texture boardTexture;
     sf::Sprite board;
+    sf::Music bgMusic;            
+    sf::SoundBuffer scoreSoundBuffer;
+    sf::Sound scoreSound;   
 };

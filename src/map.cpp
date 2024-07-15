@@ -44,8 +44,6 @@ Map::Map(int height, int width, sf::RenderWindow& window, const std::string& obs
 
     if (!waterShader.loadFromFile("shaders/water.frag", sf::Shader::Fragment)) {
         std::cerr << "Error loading water shader from assets/water.frag" << std::endl;
-    } else {
-        std::cout << "Water shader loaded successfully" << std::endl;
     }
 
     if (!waterTexture.loadFromFile("assets/water_base.png")) {
